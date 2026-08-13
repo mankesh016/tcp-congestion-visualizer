@@ -30,7 +30,7 @@ export function useSimulation({
     () => createInitialState(capacity, initialSenders),
   );
   const [isRunning, setIsRunning] = useState(false);
-  const [autoMode, setAutoMode] = useState(false);
+  const [autoMode, setAutoMode] = useState(true);
   const [tickIntervalMs, setTickIntervalMs] = useState(initialTickIntervalMs);
   const [spawnProbability, setSpawnProbability] = useState(initialSpawnProbability);
   // Jitter models a bottleneck whose realized capacity fluctuates tick to

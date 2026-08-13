@@ -23,22 +23,10 @@ function App() {
 
   return (
     <main className="app">
-      <h1>TCP Congestion Control Visualizer</h1>
+      <h1 className="title">TCP Congestion Control Visualizer</h1>
       <p className="subtitle">
         Watch AIMD converge every active sender toward an equal share of one shared link, live.
       </p>
-
-      <Controls
-        isRunning={sim.isRunning}
-        onPlay={sim.play}
-        onPause={sim.pause}
-        onStep={sim.step}
-        onReset={sim.reset}
-        onAddSender={sim.addSender}
-        canAddSender={sim.canAddSender}
-        autoMode={sim.autoMode}
-        onToggleAutoMode={sim.setAutoMode}
-      />
 
       <TunablesPanel
         capacity={sim.capacity}
@@ -59,16 +47,29 @@ function App() {
         tick={sim.tick}
       />
 
-      <CongestionChart
-        history={sim.history}
-        senderIds={sim.allSenderIds}
-        activeSenderIds={sim.network.senders.map((sender) => sender.id)}
-      />
+      <div className="chart-row">
+        <div className="chart-row-chart">
+          <CongestionChart
+            history={sim.history}
+            senderIds={sim.allSenderIds}
+            activeSenderIds={sim.network.senders.map((sender) => sender.id)}
+          />
+        </div>
+        <div className="chart-row-legend">
+          <SenderLegend senders={sim.network.senders} onRemove={sim.removeSender} />
+        </div>
+      </div>
 
-      <SenderLegend
-        senders={sim.network.senders}
-        cumulativeThroughput={sim.cumulativeThroughput}
-        onRemove={sim.removeSender}
+      <Controls
+        isRunning={sim.isRunning}
+        onPlay={sim.play}
+        onPause={sim.pause}
+        onStep={sim.step}
+        onReset={sim.reset}
+        onAddSender={sim.addSender}
+        canAddSender={sim.canAddSender}
+        autoMode={sim.autoMode}
+        onToggleAutoMode={sim.setAutoMode}
       />
     </main>
   );
