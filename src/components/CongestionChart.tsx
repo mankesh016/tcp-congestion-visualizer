@@ -17,7 +17,11 @@ interface CongestionChartProps {
 }
 
 export function CongestionChart({ history, senderIds }: CongestionChartProps) {
-  const data = history.map((snapshot) => ({ tick: snapshot.tick, ...snapshot.cwnds }));
+  const data = history.map((snapshot) => ({
+    tick: snapshot.tick,
+    fairShare: snapshot.fairShare,
+    ...snapshot.cwnds,
+  }));
 
   return (
     <ResponsiveContainer width="100%" height={360}>
@@ -30,6 +34,16 @@ export function CongestionChart({ history, senderIds }: CongestionChartProps) {
         />
         <Tooltip />
         <Legend />
+        <Line
+          type="monotone"
+          dataKey="fairShare"
+          name="Fair share (C/N)"
+          stroke="#888"
+          strokeWidth={1.5}
+          strokeDasharray="6 4"
+          dot={false}
+          isAnimationActive={false}
+        />
         {senderIds.map((id) => (
           <Line
             key={id}

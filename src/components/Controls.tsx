@@ -5,6 +5,9 @@ interface ControlsProps {
   onStep: () => void;
   onReset: () => void;
   onAddSender: () => void;
+  canAddSender: boolean;
+  autoMode: boolean;
+  onToggleAutoMode: (next: boolean) => void;
 }
 
 export function Controls({
@@ -14,6 +17,9 @@ export function Controls({
   onStep,
   onReset,
   onAddSender,
+  canAddSender,
+  autoMode,
+  onToggleAutoMode,
 }: ControlsProps) {
   return (
     <div className="controls">
@@ -26,9 +32,17 @@ export function Controls({
       <button type="button" onClick={onReset}>
         Reset
       </button>
-      <button type="button" onClick={onAddSender}>
+      <button type="button" onClick={onAddSender} disabled={!canAddSender}>
         + Add sender
       </button>
+      <label className="auto-mode-toggle">
+        <input
+          type="checkbox"
+          checked={autoMode}
+          onChange={(e) => onToggleAutoMode(e.target.checked)}
+        />
+        Auto-manage senders
+      </label>
     </div>
   );
 }
