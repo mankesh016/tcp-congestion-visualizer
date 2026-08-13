@@ -59,7 +59,11 @@ function App() {
         tick={sim.tick}
       />
 
-      <CongestionChart history={sim.history} senderIds={sim.allSenderIds} />
+      <CongestionChart
+        history={sim.history}
+        senderIds={sim.allSenderIds}
+        activeSenderIds={sim.network.senders.map((sender) => sender.id)}
+      />
 
       <SenderLegend
         senders={sim.network.senders}

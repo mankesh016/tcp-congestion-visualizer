@@ -14,11 +14,19 @@ import { colorForId } from "../lib/colors";
 interface CongestionChartProps {
   history: SimulationSnapshot[];
   senderIds: string[];
+  /** Ids currently active; ids in `senderIds` but not here are kept on the plot but dropped from the legend below it. */
+  activeSenderIds: string[];
   /** Once history exceeds this many ticks, only the most recent window is shown (scrolls forward). */
   windowSize?: number;
 }
 
-export function CongestionChart({ history, senderIds, windowSize = 50 }: CongestionChartProps) {
+export function CongestionChart({
+  history,
+  senderIds,
+  activeSenderIds,
+  windowSize = 50,
+}: CongestionChartProps) {
+  const activeSenderIdSet = new Set(activeSenderIds);
   // Slicing before mapping keeps this O(windowSize) per render instead of
   // O(history length) — matters once a long-running auto-mode session has
   // accumulated thousands of ticks.
@@ -59,6 +67,7 @@ export function CongestionChart({ history, senderIds, windowSize = 50 }: Congest
             dot={false}
             isAnimationActive={false}
             connectNulls={false}
+            legendType={activeSenderIdSet.has(id) ? "line" : "none"}
           />
         ))}
       </LineChart>
