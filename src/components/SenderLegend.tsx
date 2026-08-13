@@ -3,10 +3,11 @@ import { colorForId } from "../lib/colors";
 
 interface SenderLegendProps {
   senders: Sender[];
+  cumulativeThroughput: Record<string, number>;
   onRemove: (id: string) => void;
 }
 
-export function SenderLegend({ senders, onRemove }: SenderLegendProps) {
+export function SenderLegend({ senders, cumulativeThroughput, onRemove }: SenderLegendProps) {
   if (senders.length === 0) {
     return <p className="legend-empty">No active senders. Add one to start the simulation.</p>;
   }
@@ -19,6 +20,7 @@ export function SenderLegend({ senders, onRemove }: SenderLegendProps) {
           <span className="legend-id">{sender.id}</span>
           <span className="legend-state">{sender.state}</span>
           <span className="legend-cwnd">cwnd {sender.cwnd.toFixed(0)}</span>
+          <span className="legend-sent">sent {cumulativeThroughput[sender.id] ?? 0}</span>
           <button type="button" onClick={() => onRemove(sender.id)}>
             remove
           </button>

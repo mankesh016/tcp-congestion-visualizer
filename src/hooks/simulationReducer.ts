@@ -23,13 +23,18 @@ export interface SimulationState {
    * last recorded tick.
    */
   allSenderIds: string[];
+  /** Total ticks where the combined window exceeded capacity and every sender was cut. */
+  congestionEventCount: number;
+  /** senderId -> total cwnd segments sent across all ticks it was active. Never reset on departure. */
+  cumulativeThroughput: Record<string, number>;
 }
 
 export type SimulationAction =
-  | { type: "step" }
-  | { type: "autoTick"; spawn?: Sender; lifespanTicks?: number }
+  | { type: "step"; capacityOverride?: number }
+  | { type: "autoTick"; spawn?: Sender; lifespanTicks?: number; capacityOverride?: number }
   | { type: "add"; sender: Sender }
   | { type: "remove"; id: string }
+  | { type: "setCapacity"; capacity: number }
   | { type: "reset"; capacity: number; initialSenders: Sender[] };
 
 export function createInitialState(capacity: number, initialSenders: Sender[]): SimulationState {
@@ -39,6 +44,8 @@ export function createInitialState(capacity: number, initialSenders: Sender[]): 
     tick: 0,
     lifespans: {},
     allSenderIds: initialSenders.map((sender) => sender.id),
+    congestionEventCount: 0,
+    cumulativeThroughput: {},
   };
 }
 
@@ -48,11 +55,17 @@ function withoutKey<T>(record: Record<string, T>, key: string): Record<string, T
 }
 
 /** Grow every sender one RTT, detect/apply congestion, and record a history snapshot. */
-function advanceTick(state: SimulationState, network: Network): SimulationState {
-  const result = step(network);
+function advanceTick(
+  state: SimulationState,
+  network: Network,
+  capacityOverride?: number,
+): SimulationState {
+  const result = step(network, capacityOverride);
   const cwnds: Record<string, number> = {};
+  const cumulativeThroughput = { ...state.cumulativeThroughput };
   for (const sender of result.network.senders) {
     cwnds[sender.id] = sender.cwnd;
+    cumulativeThroughput[sender.id] = (cumulativeThroughput[sender.id] ?? 0) + sender.cwnd;
   }
   const tick = state.tick + 1;
   const senderCount = result.network.senders.length;
@@ -63,6 +76,8 @@ function advanceTick(state: SimulationState, network: Network): SimulationState 
     network: result.network,
     tick,
     history: [...state.history, { tick, cwnds, congestionEvent: result.congestionEvent, fairShare }],
+    congestionEventCount: state.congestionEventCount + (result.congestionEvent ? 1 : 0),
+    cumulativeThroughput,
   };
 }
 
@@ -84,7 +99,7 @@ export function simulationReducer(
 ): SimulationState {
   switch (action.type) {
     case "step":
-      return advanceTick(state, state.network);
+      return advanceTick(state, state.network, action.capacityOverride);
 
     case "autoTick": {
       const nextTick = state.tick + 1;
@@ -102,7 +117,7 @@ export function simulationReducer(
         allSenderIds = [...allSenderIds, action.spawn.id];
       }
 
-      return advanceTick({ ...state, lifespans, allSenderIds }, network);
+      return advanceTick({ ...state, lifespans, allSenderIds }, network, action.capacityOverride);
     }
 
     case "add":
@@ -117,6 +132,12 @@ export function simulationReducer(
         ...state,
         network: removeSender(state.network, action.id),
         lifespans: withoutKey(state.lifespans, action.id),
+      };
+
+    case "setCapacity":
+      return {
+        ...state,
+        network: { ...state.network, config: { ...state.network.config, capacity: action.capacity } },
       };
 
     case "reset":

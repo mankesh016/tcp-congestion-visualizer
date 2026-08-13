@@ -1,29 +1,31 @@
 import { CongestionChart } from "./components/CongestionChart";
 import { Controls } from "./components/Controls";
 import { SenderLegend } from "./components/SenderLegend";
+import { StatsPanel } from "./components/StatsPanel";
+import { TunablesPanel } from "./components/TunablesPanel";
 import { useSimulation } from "./hooks/useSimulation";
 import { jainsFairnessIndex } from "./lib/fairness";
 import "./App.css";
 
-const LINK_CAPACITY = 40;
+const INITIAL_LINK_CAPACITY = 40;
 
 function App() {
   const sim = useSimulation({
-    capacity: LINK_CAPACITY,
+    capacity: INITIAL_LINK_CAPACITY,
     tickIntervalMs: 400,
     initialSenderCount: 1,
   });
 
-  const activeSenderIds = sim.network.senders.map((sender) => sender.id);
-  const fairness = jainsFairnessIndex(sim.network.senders.map((sender) => sender.cwnd));
+  const activeCwnds = sim.network.senders.map((sender) => sender.cwnd);
+  const fairness = jainsFairnessIndex(activeCwnds);
+  const totalActiveCwnd = activeCwnds.reduce((sum, cwnd) => sum + cwnd, 0);
+  const utilizationPercent = (totalActiveCwnd / sim.capacity) * 100;
 
   return (
     <main className="app">
       <h1>TCP Congestion Control Visualizer</h1>
       <p className="subtitle">
-        Shared link capacity: {LINK_CAPACITY} segments/RTT · {activeSenderIds.length} active
-        sender{activeSenderIds.length === 1 ? "" : "s"} · tick {sim.tick} · fairness index{" "}
-        {fairness.toFixed(3)}
+        Watch AIMD converge every active sender toward an equal share of one shared link, live.
       </p>
 
       <Controls
@@ -38,9 +40,32 @@ function App() {
         onToggleAutoMode={sim.setAutoMode}
       />
 
+      <TunablesPanel
+        capacity={sim.capacity}
+        onCapacityChange={sim.setCapacity}
+        tickIntervalMs={sim.tickIntervalMs}
+        onTickIntervalChange={sim.setTickIntervalMs}
+        jitter={sim.jitter}
+        onJitterChange={sim.setJitter}
+        spawnProbability={sim.spawnProbability}
+        onSpawnProbabilityChange={sim.setSpawnProbability}
+      />
+
+      <StatsPanel
+        activeSenderCount={sim.network.senders.length}
+        fairnessIndex={fairness}
+        utilizationPercent={utilizationPercent}
+        congestionEventCount={sim.congestionEventCount}
+        tick={sim.tick}
+      />
+
       <CongestionChart history={sim.history} senderIds={sim.allSenderIds} />
 
-      <SenderLegend senders={sim.network.senders} onRemove={sim.removeSender} />
+      <SenderLegend
+        senders={sim.network.senders}
+        cumulativeThroughput={sim.cumulativeThroughput}
+        onRemove={sim.removeSender}
+      />
     </main>
   );
 }

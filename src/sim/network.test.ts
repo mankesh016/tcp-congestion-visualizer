@@ -30,6 +30,15 @@ describe("step", () => {
     expect(result.totalCwnd).toBe(0);
     expect(result.network.senders).toHaveLength(0);
   });
+
+  it("uses the capacity override for this tick's congestion check without mutating stored config", () => {
+    const network = createNetwork(100, [createSender("a", { initialCwnd: 6 })]);
+    // grows to 12, under the stored capacity(100) but over the override(10)
+    const result = step(network, 10);
+    expect(result.congestionEvent).toBe(true);
+    expect(result.network.senders[0].cwnd).toBe(6); // 12 halved
+    expect(result.network.config.capacity).toBe(100); // nominal capacity unchanged
+  });
 });
 
 describe("addSender / removeSender", () => {

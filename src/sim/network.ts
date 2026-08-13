@@ -25,11 +25,18 @@ export function createNetwork(capacity: number, senders: Sender[] = []): Network
  * capacity, the loss is treated as a synchronized signal: every sender
  * halves its window in the same tick. This is the standard assumption
  * behind AIMD's fairness-convergence property.
+ *
+ * `capacityOverride` lets a caller model a bottleneck whose *realized*
+ * capacity fluctuates tick to tick (cross-traffic, jitter) without
+ * mutating the network's stored nominal capacity — that value stays the
+ * stable "dial" a user sets, while the congestion check for this one tick
+ * uses the override instead.
  */
-export function step(network: Network): StepResult {
+export function step(network: Network, capacityOverride?: number): StepResult {
+  const capacity = capacityOverride ?? network.config.capacity;
   const grown = network.senders.map(growSender);
   const totalCwnd = grown.reduce((sum, s) => sum + s.cwnd, 0);
-  const congestionEvent = totalCwnd > network.config.capacity;
+  const congestionEvent = totalCwnd > capacity;
   const senders = congestionEvent ? grown.map(applyLoss) : grown;
 
   return {
