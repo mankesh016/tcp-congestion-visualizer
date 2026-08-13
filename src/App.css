@@ -5,6 +5,32 @@
   text-align: left;
 }
 
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.theme-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-top: 4px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-border);
+}
+
 .title {
   font-size: 32px;
   margin-bottom: 8px;
@@ -148,7 +174,7 @@
 }
 
 .tunable input[type="range"] {
-  accent-color: var(--accent);
+  accent-color: var(--slider-accent);
   width: 100%;
 }
 
@@ -244,13 +270,13 @@
   margin-top: 6px;
   height: 4px;
   border-radius: 2px;
-  background: var(--accent-bg);
+  background: var(--border);
   overflow: hidden;
 }
 
 .stat-meter-fill {
   height: 100%;
-  background: var(--accent);
+  background: var(--slider-accent);
   border-radius: 3px;
   transition: width 0.3s ease;
 }

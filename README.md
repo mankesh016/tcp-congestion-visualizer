@@ -1,5 +1,11 @@
 # TCP Congestion Control Visualizer
 
+[![React](https://img.shields.io/badge/React-19-149eca?logo=react&logoColor=white)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Vite](https://img.shields.io/badge/Vite-bundler-646cff?logo=vite&logoColor=white)](https://vite.dev)
+[![Vitest](https://img.shields.io/badge/Vitest-tested-6e9f18?logo=vitest&logoColor=white)](https://vitest.dev)
+[![Last commit](https://img.shields.io/github/last-commit/mankesh016/tcp-congestion-visualizer)](https://github.com/mankesh016/tcp-congestion-visualizer/commits)
+
 An interactive, browser-based visualization of TCP congestion control — slow
 start, congestion avoidance (AIMD), and the fairness convergence property
 that emerges when multiple flows share one bottleneck link.

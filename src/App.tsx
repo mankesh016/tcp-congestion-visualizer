@@ -2,6 +2,7 @@ import { CongestionChart } from "./components/CongestionChart";
 import { Controls } from "./components/Controls";
 import { SenderLegend } from "./components/SenderLegend";
 import { StatsPanel } from "./components/StatsPanel";
+import { ThemeToggle } from "./components/ThemeToggle";
 import { TunablesPanel } from "./components/TunablesPanel";
 import { useSimulation } from "./hooks/useSimulation";
 import { jainsFairnessIndex } from "./lib/fairness";
@@ -23,10 +24,15 @@ function App() {
 
   return (
     <main className="app">
-      <h1 className="title">TCP Congestion Control Visualizer</h1>
-      <p className="subtitle">
-        Watch AIMD converge every active sender toward an equal share of one shared link, live.
-      </p>
+      <div className="app-header">
+        <div>
+          <h1 className="title">TCP Congestion Control Visualizer</h1>
+          <p className="subtitle">
+            Watch AIMD converge every active sender toward an equal share of one shared link, live.
+          </p>
+        </div>
+        <ThemeToggle />
+      </div>
 
       <TunablesPanel
         capacity={sim.capacity}
