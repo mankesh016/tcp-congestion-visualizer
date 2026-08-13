@@ -4,7 +4,40 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>tcp-congestion-visualizer</title>
+
+    <title>TCP Congestion Control Visualizer</title>
+    <meta
+      name="description"
+      content="An interactive, browser-based simulation of how TCP shares a network link fairly among competing senders. Watch slow start, AIMD (Additive Increase, Multiplicative Decrease), and fairness convergence happen live."
+    />
+    <meta
+      name="keywords"
+      content="TCP, congestion control, slow start, AIMD, additive increase multiplicative decrease, computer networks, network simulation, fairness, Jain's fairness index, TCP visualizer"
+    />
+    <meta name="author" content="mankesh016" />
+    <meta name="robots" content="index, follow" />
+
+    <!--
+      og:image and og:url need an absolute URL to work when this is shared
+      (crawlers can't resolve relative paths) — update the domain below if
+      it ever changes.
+    -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="TCP Congestion Control Visualizer" />
+    <meta
+      property="og:description"
+      content="Watch TCP slow start, AIMD, and fairness convergence happen live, right in your browser."
+    />
+    <meta property="og:image" content="https://tcp-congestion-visualizer.vercel.app/og-image.png" />
+    <meta property="og:url" content="https://tcp-congestion-visualizer.vercel.app/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="TCP Congestion Control Visualizer" />
+    <meta
+      name="twitter:description"
+      content="Watch TCP slow start, AIMD, and fairness convergence happen live, right in your browser."
+    />
+    <meta name="twitter:image" content="https://tcp-congestion-visualizer.vercel.app/og-image.png" />
   </head>
   <body>
     <div id="root"></div>
