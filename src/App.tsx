@@ -14,15 +14,15 @@ function App() {
     initialSenderCount: 1,
   });
 
-  const senderIds = sim.network.senders.map((sender) => sender.id);
+  const activeSenderIds = sim.network.senders.map((sender) => sender.id);
   const fairness = jainsFairnessIndex(sim.network.senders.map((sender) => sender.cwnd));
 
   return (
     <main className="app">
       <h1>TCP Congestion Control Visualizer</h1>
       <p className="subtitle">
-        Shared link capacity: {LINK_CAPACITY} segments/RTT · {senderIds.length} active sender
-        {senderIds.length === 1 ? "" : "s"} · tick {sim.tick} · fairness index{" "}
+        Shared link capacity: {LINK_CAPACITY} segments/RTT · {activeSenderIds.length} active
+        sender{activeSenderIds.length === 1 ? "" : "s"} · tick {sim.tick} · fairness index{" "}
         {fairness.toFixed(3)}
       </p>
 
@@ -38,7 +38,7 @@ function App() {
         onToggleAutoMode={sim.setAutoMode}
       />
 
-      <CongestionChart history={sim.history} senderIds={senderIds} />
+      <CongestionChart history={sim.history} senderIds={sim.allSenderIds} />
 
       <SenderLegend senders={sim.network.senders} onRemove={sim.removeSender} />
     </main>

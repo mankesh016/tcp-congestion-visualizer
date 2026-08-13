@@ -43,6 +43,18 @@ describe("simulationReducer", () => {
     expect(next.network.senders.map((s) => s.id)).toEqual(["S2"]);
   });
 
+  it("keeps a removed sender's id in allSenderIds so its chart history is not discarded", () => {
+    let state = createInitialState(100, [makeSender(1), makeSender(2)]);
+    state = simulationReducer(state, { type: "step" }); // history recorded for both
+    state = simulationReducer(state, { type: "remove", id: "S1" });
+    state = simulationReducer(state, { type: "step" }); // only S2 grows/recorded now
+
+    expect(state.allSenderIds).toEqual(["S1", "S2"]);
+    expect(state.network.senders.map((s) => s.id)).toEqual(["S2"]);
+    expect(state.history[0].cwnds).toEqual({ S1: 2, S2: 2 });
+    expect(state.history[1].cwnds).toEqual({ S2: 4 });
+  });
+
   it("resets to a fresh network, empty history, and tick 0", () => {
     let state = createInitialState(100, [makeSender(1)]);
     state = simulationReducer(state, { type: "step" });
@@ -106,6 +118,7 @@ describe("simulationReducer autoTick", () => {
     state = simulationReducer(state, { type: "autoTick" }); // tick 3, S2 departs
     expect(state.network.senders.map((s) => s.id)).toEqual(["S1"]);
     expect(state.lifespans).toEqual({});
+    expect(state.allSenderIds).toEqual(["S1", "S2"]); // S2's history stays even after it departs
   });
 
   it("clears a sender's lifespan entry when it is manually removed early", () => {

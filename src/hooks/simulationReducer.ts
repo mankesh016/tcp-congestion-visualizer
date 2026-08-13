@@ -15,6 +15,14 @@ export interface SimulationState {
   tick: number;
   /** senderId -> tick at which it should automatically depart. Only set for auto-spawned senders. */
   lifespans: Record<string, number>;
+  /**
+   * Every sender id that has ever joined this run, in order, including ones
+   * that have since left. The chart draws a line per id in this list (not
+   * per currently-active sender) so a departed sender's history stays on
+   * screen instead of vanishing — the line simply stops extending past its
+   * last recorded tick.
+   */
+  allSenderIds: string[];
 }
 
 export type SimulationAction =
@@ -25,7 +33,13 @@ export type SimulationAction =
   | { type: "reset"; capacity: number; initialSenders: Sender[] };
 
 export function createInitialState(capacity: number, initialSenders: Sender[]): SimulationState {
-  return { network: createNetwork(capacity, initialSenders), history: [], tick: 0, lifespans: {} };
+  return {
+    network: createNetwork(capacity, initialSenders),
+    history: [],
+    tick: 0,
+    lifespans: {},
+    allSenderIds: initialSenders.map((sender) => sender.id),
+  };
 }
 
 function withoutKey<T>(record: Record<string, T>, key: string): Record<string, T> {
@@ -81,16 +95,22 @@ export function simulationReducer(
       let network = expiredIds.reduce((net, id) => removeSender(net, id), state.network);
       let lifespans = expiredIds.reduce((ls, id) => withoutKey(ls, id), state.lifespans);
 
+      let allSenderIds = state.allSenderIds;
       if (action.spawn) {
         network = addSender(network, action.spawn);
         lifespans = { ...lifespans, [action.spawn.id]: nextTick + (action.lifespanTicks ?? 0) };
+        allSenderIds = [...allSenderIds, action.spawn.id];
       }
 
-      return advanceTick({ ...state, lifespans }, network);
+      return advanceTick({ ...state, lifespans, allSenderIds }, network);
     }
 
     case "add":
-      return { ...state, network: addSender(state.network, action.sender) };
+      return {
+        ...state,
+        network: addSender(state.network, action.sender),
+        allSenderIds: [...state.allSenderIds, action.sender.id],
+      };
 
     case "remove":
       return {

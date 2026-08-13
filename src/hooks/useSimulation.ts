@@ -77,6 +77,7 @@ export function useSimulation({
   return {
     network: state.network,
     history: state.history,
+    allSenderIds: state.allSenderIds,
     tick: state.tick,
     isRunning,
     autoMode,
