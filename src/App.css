@@ -126,6 +126,12 @@
 @media (max-width: 720px) {
   .chart-row {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-row-chart {
+    flex: 1 1 auto;
+    width: 100%;
   }
 
   .chart-row-legend {
