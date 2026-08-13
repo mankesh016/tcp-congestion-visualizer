@@ -14,10 +14,15 @@ import { colorForId } from "../lib/colors";
 interface CongestionChartProps {
   history: SimulationSnapshot[];
   senderIds: string[];
+  /** Once history exceeds this many ticks, only the most recent window is shown (scrolls forward). */
+  windowSize?: number;
 }
 
-export function CongestionChart({ history, senderIds }: CongestionChartProps) {
-  const data = history.map((snapshot) => ({
+export function CongestionChart({ history, senderIds, windowSize = 50 }: CongestionChartProps) {
+  // Slicing before mapping keeps this O(windowSize) per render instead of
+  // O(history length) — matters once a long-running auto-mode session has
+  // accumulated thousands of ticks.
+  const data = history.slice(-windowSize).map((snapshot) => ({
     tick: snapshot.tick,
     fairShare: snapshot.fairShare,
     ...snapshot.cwnds,
